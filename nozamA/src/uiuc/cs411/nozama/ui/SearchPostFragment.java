@@ -2,6 +2,7 @@ package uiuc.cs411.nozama.ui;
 
 import java.util.List;
 
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import uiuc.cs411.nozama.R;
 import uiuc.cs411.nozama.content.Content;
 import uiuc.cs411.nozama.parser.ParseInput;
+
 
 /**
  * A fragment for creating a post. This fragment is either
@@ -60,6 +63,28 @@ public class SearchPostFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.search_post,
 					container, false);
 		EditText search = (EditText) rootView.findViewById(R.id.searchQuery);
+		
+		ListView resultList = (ListView) rootView.findViewById(R.id.queryResults);
+		
+        resultList.setAdapter(new ArrayAdapter(
+                getActivity(),
+                android.R.layout.simple_list_item_activated_2,
+                android.R.id.text1) {        	
+        			@Override
+        			public View getView(int position, View convertView, ViewGroup parent) {
+        				View view = super.getView(position, convertView, parent);
+        				TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+        				TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+        				
+        				String title = ParseInput.dataList.get(position).getTitle();
+        				String body = ParseInput.dataList.get(position).getBody();
+        				
+        				text1.setText(title);
+        				text2.setText(body);
+        				return view;
+        			}
+        });
+		
 		search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			
 			@Override
