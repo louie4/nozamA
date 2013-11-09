@@ -19,7 +19,7 @@ public class ParseInput {
 	}
 
 	/**
-	 * Creates a JSON data object representing a post
+	 * Executes a HTTP POST Request to database for creating a post
 	 * @param title The title taken from user input
 	 * @param description The description taken from user input
 	 * @param pathToFile The path to the picture file chosen by user
@@ -27,67 +27,30 @@ public class ParseInput {
 	 */
 	public static boolean createPost(String title, String description, String pathToFile, String username) {
 		/* 
-		 * TODO: 
-		 * Basics -
-		 * Generate ID of post
-		 * Extract keywords from description (hashtags)
-		 * Place data into JSON object
-		 * Call function to send JSON object (or return JSON object and have send method call this method)
-		 * Return whether or not post is successful
-		 * 
-		 * Advanced - Decide what to do with the image file
+		 * TODO: Implement http://www.androidsnippets.com/executing-a-http-post-request-with-httpclient
+		 * Replace BasicNameValuePairs with the ids used by web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php
+		 * and the corresponding strings in the parameters
+		 * Replace the url with web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php
+		 * TODO: Decide what to do with the image file
 		 */
 		
-	    Data data = new Data();
-	    Gson gson = new Gson();
-	    
-	    //set datafields
-	    data.setTitle(title);
-	    data.setBody(body);
-	    
-	    // Show it.
-	    System.out.println(data);
-	    
-	    //make string
-	    String json = gson.toJson(data);
-	
-	    //parse and make JSON
-	    JsonParser parser = new JsonParser();
-	    JsonObject object = (JsonObject)parser.parse(json);
-	    
-	    sendJSON(object);
-	    
-		System.out.println(json);
-		if (json != "0" || json != null) 
-			return true;
-		else return false;
 	}
 	
-	private static void sendJSON(JsonObject object) {
-		// TODO send JSON obj somewhere
-		
-	}   
-}
-	
 	/**
-	 * Creates a JSON data object representing a query
+	 * Executes a HTTP Post Request to the database for doing a query
 	 * @param query The query taken from user input
-	 * @return List of bundles which contain the response tuple data
+	 * @return Data Object
 	 */
 	public static List<Bundle> createQuery(String query) {
 		/*
-		 * TODO: Create JSON query from given string
-		 * Call function to send JSON object (or return JSON object and have send method call this method)
-		 * Wait for response
-		 * Parse response into Bundle
+		 * TODO: Implement http://www.androidsnippets.com/executing-a-http-post-request-with-httpclient
+		 * Replace BasicNameValuePairs with the ids used by web.engr.illinois.edu/~mgathma2/noZama/webInterface/testSearch.php
+		 * and the corresponding strings in the parameters
+		 * Replace the url with web.engr.illinois.edu/~mgathma2/noZama/webInterface/testSearch.php and get the JSON for the query
+		 * results
+		 * 
+		 * TODO: call Aaron's method parse(JsonObject json) on the json returned from the server to get a Data object
 		 */
-				
-//		Bundle b = new Bundle();
-//		b.putString("title", value);
-//		b.putString("body", value);
-//		b.putString("price", value);
-//		b.putString("picture", value);
-//		b.putString("responseID", value);
 		
 		return null;
 	}
