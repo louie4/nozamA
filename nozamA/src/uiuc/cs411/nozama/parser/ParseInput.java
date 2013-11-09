@@ -1,10 +1,22 @@
 package uiuc.cs411.nozama.parser;
 
 import java.util.List;
-
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import android.os.Bundle;
 
 public class ParseInput {
+	
+	public static void main(String... args) {
+        
+	    boolean check = createPost("Buying Girlfriend", "Must be really hot", "not yet", "aaronluo");
+	    System.out.print("create post returns: " + check);
+        
+	}
 
 	/**
 	 * Creates a JSON data object representing a post
@@ -26,8 +38,36 @@ public class ParseInput {
 		 * Advanced - Decide what to do with the image file
 		 */
 		
-		return false;
+	    Data data = new Data();
+	    Gson gson = new Gson();
+	    
+	    //set datafields
+	    data.setTitle(title);
+	    data.setBody(body);
+	    
+	    // Show it.
+	    System.out.println(data);
+	    
+	    //make string
+	    String json = gson.toJson(data);
+	
+	    //parse and make JSON
+	    JsonParser parser = new JsonParser();
+	    JsonObject object = (JsonObject)parser.parse(json);
+	    
+	    sendJSON(object);
+	    
+		System.out.println(json);
+		if (json != "0" || json != null) 
+			return true;
+		else return false;
 	}
+	
+	private static void sendJSON(JsonObject object) {
+		// TODO send JSON obj somewhere
+		
+	}   
+}
 	
 	/**
 	 * Creates a JSON data object representing a query
@@ -51,4 +91,35 @@ public class ParseInput {
 		
 		return null;
 	}
+}
+
+class Data {
+    private String title;
+    private String tag;
+    private String keyword;
+    private String body;
+    private String msg;
+    private String user;
+    private boolean success;
+
+
+    public String getTitle() { return title; }
+    public String getTag() { return tag; }
+    public String getKeyword() { return keyword; }
+    public String getBody() { return body; }
+    public String getMsg() { return msg; }
+    public String getUser() { return user; }
+    public boolean getSuccess() { return success; }
+
+    public void setTitle(String title) { this.title = title; }
+    public void setTag(String tag) { this.tag = tag; }
+    public void setKeyword(String keyword) { this.keyword = keyword; }
+    public void setBody(String body) { this.body = body; }
+    public void setMsg(String msg) { this.msg = msg; }
+    public void setSuccess(boolean success) { this.success = success; }
+
+    
+    public String toString() {
+        return String.format("title: %s, body: %s", title, body);
+    }
 }
