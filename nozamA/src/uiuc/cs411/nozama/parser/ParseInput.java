@@ -1,5 +1,6 @@
 package uiuc.cs411.nozama.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,7 +10,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import android.os.Bundle;
 
+
+
 public class ParseInput {
+	
+	public static ArrayList<Data> dataList;
 	
 	public static void main(String... args) {
         
@@ -53,6 +58,16 @@ public class ParseInput {
 		 */
 		
 		return null;
+	}
+	
+	/**
+	 * Parses JsonObject from server and creates a Data Object.
+	 * Stores the Data object in the Data list
+	 * @param results The Json
+	 * @return The Data Object
+	 */
+	public Data parse(JsonObject results) {
+		
 	}
 }
 
