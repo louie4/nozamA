@@ -2,19 +2,29 @@ package uiuc.cs411.nozama.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.io.FileWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import android.os.Bundle;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 
 
 public class ParseInput {
 	
-	public static ArrayList<Data> dataList;
+	public static ArrayList<PostData> dataList;
 	
 	public static void main(String... args) {
         
@@ -56,59 +66,32 @@ public class ParseInput {
 	 * @return True on success, False on failure
 	 */
 	public static boolean createPost(String title, String description, String pathToFile, String username) {
-		/* 
-		 * TODO: Implement http://www.androidsnippets.com/executing-a-http-post-request-with-httpclient
-		 * Replace BasicNameValuePairs with the ids used by web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php
-		 * and the corresponding strings in the parameters
-		 * Replace the url with web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php
+		/*
 		 * TODO: Decide what to do with the image file
 		 */
-		 
-		/* old
-		Data data = new Data();
-		Gson gson = new Gson();
-		
-		//set datafields
-		data.setTitle(title);
-		data.setBody(body);
-		
-		// Show it.
-		System.out.println(data);
-		
-		//make string
-		String json = gson.toJson(data);
-		
-		//parse and make JSON
-		JsonParser parser = new JsonParser();
-		JsonObject obj = (JsonObject)parser.parse(json);
-		
-		//send somewhere?
-		sendJSON(obj);
-		
-		if (json != "0" || json != null) 
-			return true;
-		else return false;
-		
-		*/
 	    	
 	        HttpClient httpclient = new DefaultHttpClient();
 	        HttpPost httppost = new HttpPost("http://web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php");
-	
+	        HttpResponse response = null;
+	        
 	        try {
 	            // Add your data
 	            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-	            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-	            nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
+	            nameValuePairs.add(new BasicNameValuePair("title", title));
+	            nameValuePairs.add(new BasicNameValuePair("body", description));
 	            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 	
 	            // Execute HTTP Post Request
-	            HttpResponse response = httpclient.execute(httppost);
+	            response = httpclient.execute(httppost);
 	            
 	        } catch (ClientProtocolException e) {
-	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	            return false;
 	        } catch (IOException e) {
-	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	            return false;
 	        }
+	        return true;
 		    
 	}
 	
@@ -117,58 +100,78 @@ public class ParseInput {
 	 * @param query The query taken from user input
 	 * @return Data Object
 	 */
-	public static List<Bundle> createQuery(String query) {
-		/*
-		 * TODO: Implement http://www.androidsnippets.com/executing-a-http-post-request-with-httpclient
-		 * Replace BasicNameValuePairs with the ids used by web.engr.illinois.edu/~mgathma2/noZama/webInterface/testSearch.php
-		 * and the corresponding strings in the parameters
-		 * Replace the url with web.engr.illinois.edu/~mgathma2/noZama/webInterface/testSearch.php and get the JSON for the query
-		 * results
-		 * 
-		 * TODO: call Aaron's method parse(JsonObject json) on the json returned from the server to get a Data object
-		 */
-		
-		return null;
+	public static ArrayList<PostData> createQuery(String query) {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://web.engr.illinois.edu/~mgathma2/noZama/webInterface/testSearch.php");
+        HttpResponse response = null;
+        
+        try {
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair("keyword", query));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            response = httpclient.execute(httppost);
+            
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        
+        ArrayList<PostData> data = null;
+        try {
+			data = parse(response);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        return data;
 	}
 	
 	/**
-	 * Parses JsonObject from server and creates a Data Object.
+	 * Parses response from server and creates a Data Object.
 	 * Stores the Data object in the Data list
-	 * @param results The Json
+	 * @param results The HttpResponse from the database
 	 * @return The Data Object
+	 * @throws IOException 
+	 * @throws IllegalStateException 
+	 * @throws UnsupportedEncodingException 
+	 * @throws JSONException 
 	 */
-	public Data parse(JsonObject results) {
+	public static ArrayList<PostData> parse(HttpResponse results) throws UnsupportedEncodingException, IllegalStateException, IOException, JSONException {
+		HttpResponse response = results;
+		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+		StringBuilder builder = new StringBuilder();
+		for (String line = null; (line = reader.readLine()) != null;) {
+		    builder.append(line).append("\n");
+		}
+		JSONTokener tokener = new JSONTokener(builder.toString());
+		JSONArray finalResult = new JSONArray(tokener);
+		ArrayList<PostData> data = new ArrayList<PostData>();
 		
+		for(int i = 0; i < finalResult.length(); i++) {
+			JSONObject result = finalResult.getJSONObject(i);
+			String title = result.getString("title");
+			String body = result.getString("body");
+			PostData post = new PostData(title, body);
+			data.add(post);
+		}
+		return data;
 	}
 }
 
-class Data {
-    private String title;
-    private String tag;
-    private String keyword;
-    private String body;
-    private String msg;
-    private String user;
-    private boolean success;
 
-
-    public String getTitle() { return title; }
-    public String getTag() { return tag; }
-    public String getKeyword() { return keyword; }
-    public String getBody() { return body; }
-    public String getMsg() { return msg; }
-    public String getUser() { return user; }
-    public boolean getSuccess() { return success; }
-
-    public void setTitle(String title) { this.title = title; }
-    public void setTag(String tag) { this.tag = tag; }
-    public void setKeyword(String keyword) { this.keyword = keyword; }
-    public void setBody(String body) { this.body = body; }
-    public void setMsg(String msg) { this.msg = msg; }
-    public void setSuccess(boolean success) { this.success = success; }
-
-    
-    public String toString() {
-        return String.format("title: %s, body: %s", title, body);
-    }
-}

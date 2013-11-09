@@ -66,7 +66,7 @@ public class SearchPostFragment extends Fragment {
 		
 		ListView resultList = (ListView) rootView.findViewById(R.id.queryResults);
 		
-        resultList.setAdapter(new ArrayAdapter(
+        resultList.setAdapter(new ArrayAdapter<String>(
                 getActivity(),
                 android.R.layout.simple_list_item_activated_2,
                 android.R.id.text1) {        	
@@ -99,7 +99,7 @@ public class SearchPostFragment extends Fragment {
 //						Toast toast = Toast.makeText(context, text, duration);
 //						toast.show();
 						
-						List<Bundle> responses = ParseInput.createQuery(query);
+						ParseInput.createQuery(query);
 						
 						return true;
 					}
