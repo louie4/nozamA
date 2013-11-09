@@ -18,8 +18,33 @@ public class ParseInput {
 	
 	public static void main(String... args) {
         
-	    boolean check = createPost("Buying Girlfriend", "Must be really hot", "not yet", "aaronluo");
-	    System.out.print("create post returns: " + check);
+	    	/* checks createPost
+	        boolean check = createPost("Buying Girlfriend", , "not yet", "aaronluo");
+	        System.out.print("create post returns: " + check);
+	        */
+	
+	    	/* checks parse
+	        Data data = new Data();
+	        Gson gson = new Gson();
+	        
+	        //set datafields
+	        data.setTitle("Buying Girlfriend");
+	        data.setBody("Must be really hot");
+	        
+	        // Show it.
+	        System.out.println(data);
+	        
+	        //make string
+	        String json = gson.toJson(data);
+	
+	        //parse and make JSON
+	        JsonParser parser = new JsonParser();
+	        JsonObject obj = (JsonObject)parser.parse(json); 
+	        
+	        
+	        Data print = new Gson().fromJson(obj, Data.class);
+	        System.out.println(print.getTitle()+ print.getBody()+ print.getUser());
+	        */
         
 	}
 
@@ -38,7 +63,53 @@ public class ParseInput {
 		 * Replace the url with web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php
 		 * TODO: Decide what to do with the image file
 		 */
+		 
+		/* old
+		Data data = new Data();
+		Gson gson = new Gson();
 		
+		//set datafields
+		data.setTitle(title);
+		data.setBody(body);
+		
+		// Show it.
+		System.out.println(data);
+		
+		//make string
+		String json = gson.toJson(data);
+		
+		//parse and make JSON
+		JsonParser parser = new JsonParser();
+		JsonObject obj = (JsonObject)parser.parse(json);
+		
+		//send somewhere?
+		sendJSON(obj);
+		
+		if (json != "0" || json != null) 
+			return true;
+		else return false;
+		
+		*/
+	    	
+	        HttpClient httpclient = new DefaultHttpClient();
+	        HttpPost httppost = new HttpPost("http://web.engr.illinois.edu/~mgathma2/noZama/webInterface/testNewPost.php");
+	
+	        try {
+	            // Add your data
+	            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
+	            nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
+	            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+	
+	            // Execute HTTP Post Request
+	            HttpResponse response = httpclient.execute(httppost);
+	            
+	        } catch (ClientProtocolException e) {
+	            // TODO Auto-generated catch block
+	        } catch (IOException e) {
+	            // TODO Auto-generated catch block
+	        }
+		    
 	}
 	
 	/**
