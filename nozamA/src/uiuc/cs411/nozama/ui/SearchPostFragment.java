@@ -2,6 +2,8 @@ package uiuc.cs411.nozama.ui;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,12 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import uiuc.cs411.nozama.R;
 import uiuc.cs411.nozama.content.Content;
-import uiuc.cs411.nozama.parser.ParseInput;
-
+import uiuc.cs411.nozama.network.DatabaseTask;
 
 /**
- * A fragment for creating a post. This fragment is either
- * contained in a {@link ItemListActivity} in two-pane mode (on tablets) or a
+ * A fragment for creating a post. This fragment is either contained in a
+ * {@link ItemListActivity} in two-pane mode (on tablets) or a
  * {@link ItemDetailActivity} on handsets.
  */
 public class SearchPostFragment extends Fragment {
@@ -38,6 +39,8 @@ public class SearchPostFragment extends Fragment {
 	 */
 	private Content.Item mItem;
 
+	public static JSONArray result;
+	
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
@@ -60,47 +63,59 @@ public class SearchPostFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.search_post,
-					container, false);
+		View rootView = inflater
+				.inflate(R.layout.search_post, container, false);
 		EditText search = (EditText) rootView.findViewById(R.id.searchQuery);
-		
-		ListView resultList = (ListView) rootView.findViewById(R.id.queryResults);
-		
-        resultList.setAdapter(new ArrayAdapter<String>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_2,
-                android.R.id.text1) {        	
-        			@Override
-        			public View getView(int position, View convertView, ViewGroup parent) {
-        				View view = super.getView(position, convertView, parent);
-        				TextView text1 = (TextView) view.findViewById(android.R.id.text1);
-        				TextView text2 = (TextView) view.findViewById(android.R.id.text2);
-        				
-        				String title = ParseInput.dataList.get(position).getTitle();
-        				String body = ParseInput.dataList.get(position).getBody();
-        				
-        				text1.setText(title);
-        				text2.setText(body);
-        				return view;
-        			}
-        });
-		
-		search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			
+
+		ListView resultList = (ListView) rootView
+				.findViewById(R.id.queryResults);
+
+		resultList.setAdapter(new ArrayAdapter<String>(getActivity(),
+				android.R.layout.simple_list_item_activated_2,
+				android.R.id.text1) {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View view = super.getView(position, convertView, parent);
+				TextView text1 = (TextView) view
+						.findViewById(android.R.id.text1);
+				TextView text2 = (TextView) view
+						.findViewById(android.R.id.text2);
+
+				String title = "";
+				String body = "";
+				try {
+					JSONObject object = result
+							.getJSONObject(position);
+					title = object.getString("title");
+					body = object.getString("body");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				text1.setText(title);
+				text2.setText(body);
+				return view;
+			}
+		});
+
+		search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 					String query = v.getText().toString();
-					if(query.length() > 0) {
-//						Context context = getActivity().getApplicationContext();
-//						CharSequence text = "query:" + query;
-//						int duration = Toast.LENGTH_SHORT;
-//	
-//						Toast toast = Toast.makeText(context, text, duration);
-//						toast.show();
-						
-						ParseInput.createQuery(query);
-						
+					if (query.length() > 0) {
+						// Context context =
+						// getActivity().getApplicationContext();
+						// CharSequence text = "query:" + query;
+						// int duration = Toast.LENGTH_SHORT;
+						//
+						// Toast toast = Toast.makeText(context, text,
+						// duration);
+						// toast.show();
+
+						new DatabaseTask().execute("" + DatabaseTask.SEARCH_QUERY, query);
+
 						return true;
 					}
 				}

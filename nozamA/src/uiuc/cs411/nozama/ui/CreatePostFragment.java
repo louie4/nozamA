@@ -16,14 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 import uiuc.cs411.nozama.R;
 import uiuc.cs411.nozama.content.Content;
-import uiuc.cs411.nozama.parser.ParseInput;
+import uiuc.cs411.nozama.network.DatabaseTask;
 
 /**
  * A fragment for creating a post. This fragment is either
@@ -84,7 +83,8 @@ public class CreatePostFragment extends Fragment {
 			Toast toast = Toast.makeText(context, text, duration);
 			toast.show();
 			
-			ParseInput.createPost(title, description, pathToImage, "default_user");
+			String[] taskParams = { "" + DatabaseTask.CREATE_POST, title, description, pathToImage};
+			new DatabaseTask().execute(taskParams);
 		}
 
 		
