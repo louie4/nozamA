@@ -1,5 +1,6 @@
 package uiuc.cs411.nozama.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -8,6 +9,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +41,10 @@ public class SearchPostFragment extends Fragment {
 	 */
 	private Content.Item mItem;
 
-	public static JSONArray result;
+	public static  ArrayAdapter<Content.Item> adapter;
+	
+	public static ArrayList<Content.Item> titles = new ArrayList<Content.Item>();
+	public static ArrayList<Content.Item> bodies = new ArrayList<Content.Item>();
 	
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -70,52 +75,47 @@ public class SearchPostFragment extends Fragment {
 		ListView resultList = (ListView) rootView
 				.findViewById(R.id.queryResults);
 
-		resultList.setAdapter(new ArrayAdapter<String>(getActivity(),
-				android.R.layout.simple_list_item_activated_2,
-				android.R.id.text1) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-				View view = super.getView(position, convertView, parent);
-				TextView text1 = (TextView) view
-						.findViewById(android.R.id.text1);
-				TextView text2 = (TextView) view
-						.findViewById(android.R.id.text2);
-
-				String title = "";
-				String body = "";
-				try {
-					JSONObject object = result
-							.getJSONObject(position);
-					title = object.getString("title");
-					body = object.getString("body");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				text1.setText(title);
-				text2.setText(body);
-				return view;
-			}
-		});
+		adapter = new  ArrayAdapter<Content.Item>(
+                getActivity(),
+                android.R.layout.simple_list_item_activated_1,
+                android.R.id.text1,
+                bodies);
+		
+        resultList.setAdapter(adapter);
+		
+//		resultList.setAdapter(new ArrayAdapter<String>(getActivity(),
+//				android.R.layout.simple_list_item_activated_2,
+//				android.R.id.text1) {
+//			
+//			@Override
+//			public View getView(int position, View convertView, ViewGroup parent) {
+//				View view = super.getView(position, convertView, parent);
+//				TextView text1 = (TextView) view
+//						.findViewById(android.R.id.text1);
+//				TextView text2 = (TextView) view
+//						.findViewById(android.R.id.text2);
+//				
+//				String title = titles.get(position);
+//				String body = bodies.get(position);
+//
+//
+//				text1.setText(title);
+//				text2.setText(body);
+//				return view;
+//			}
+//		});
 
 		search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
+			
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 					String query = v.getText().toString();
 					if (query.length() > 0) {
-						// Context context =
-						// getActivity().getApplicationContext();
-						// CharSequence text = "query:" + query;
-						// int duration = Toast.LENGTH_SHORT;
-						//
-						// Toast toast = Toast.makeText(context, text,
-						// duration);
-						// toast.show();
 
 						new DatabaseTask().execute("" + DatabaseTask.SEARCH_QUERY, query);
-
+						
 						return true;
 					}
 				}
@@ -123,5 +123,11 @@ public class SearchPostFragment extends Fragment {
 			}
 		});
 		return rootView;
+	}
+
+	public static void emptyLists() {
+		bodies.clear();
+		titles.clear();
+		
 	}
 }

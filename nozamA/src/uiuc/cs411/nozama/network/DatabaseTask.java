@@ -14,12 +14,16 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import uiuc.cs411.nozama.R;
+import uiuc.cs411.nozama.content.Content;
+import uiuc.cs411.nozama.content.Content.Item;
 import uiuc.cs411.nozama.ui.SearchPostFragment;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ListView;
 
-public class DatabaseTask extends AsyncTask<String, Void, JSONArray> {
+public class DatabaseTask extends AsyncTask<String, Void, JSONObject> {
 
 	public static final int CREATE_POST = 0;
 	public static final int SEARCH_QUERY = 1;
@@ -27,11 +31,11 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONArray> {
 	private static final String DATABASE_SITE = "http://web.engr.illinois.edu/~mgathma2/noZama/noZamaDB.php";
 
 	@Override
-	protected JSONArray doInBackground(String... params) {
+	protected JSONObject doInBackground(String... params) {
 		Log.d("TEST", "testing execute");
 		int type = Integer.parseInt(params[0]);
 		List<NameValuePair> nameValuePairs;
-		JSONArray response = null;
+		JSONObject response = null;
 		switch (type) {
 		case CREATE_POST:
 			nameValuePairs = new ArrayList<NameValuePair>(3);
@@ -50,12 +54,12 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONArray> {
 		return response;
 	}
 
-	private JSONArray sendHttpPost(int postType,
+	private JSONObject sendHttpPost(int postType,
 			List<NameValuePair> nameValuePairs) {
 		
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(DATABASE_SITE);
-		JSONArray ja = null;
+		JSONObject jo = null;
 
 		try {
 			Log.d("HTTP", "Sending HTTP POST");
@@ -64,18 +68,35 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONArray> {
 			Log.d("HTTP", "Finished sending");
 	        String result = EntityUtils.toString(response.getEntity());
 	        Log.d("MYJSON", result);
-	        JSONObject jo = new JSONObject(result); 
-	        ja = new JSONArray();
-	        ja.put(jo);
+	        jo = new JSONObject(result); 
 	        
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return ja;
+		return jo;
 	}
 
-	protected void onPostExecute(JSONArray result) {
-		SearchPostFragment.result = result;
+	protected void onPostExecute(JSONObject result) {
+		try {
+			if(result.getString("tag").equals("search posts")) {
+				JSONArray posts = result.getJSONArray("posts");
+				Log.d("post", posts.toString());
+				JSONObject object = posts.getJSONObject(0);
+				Log.d("object", object.toString());
+				Log.d("title", object.getString("title"));
+				SearchPostFragment.emptyLists();
+				for(int i = 0; i < posts.length(); i++) {
+					Log.d("i",""+i);
+					String title = posts.getJSONObject(i).getString("title");
+					SearchPostFragment.titles.add(new Content.Item("title",posts.getJSONObject(i).getString("title")));
+					SearchPostFragment.bodies.add(new Content.Item("body",title + ": " +posts.getJSONObject(i).getString("body")));;
+				}
+				
+				SearchPostFragment.adapter.notifyDataSetChanged();
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
