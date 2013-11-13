@@ -12,6 +12,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
+import org.json.JSONObject;
+
 import uiuc.cs411.nozama.ui.SearchPostFragment;
 
 import android.os.AsyncTask;
@@ -26,19 +28,22 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONArray> {
 
 	@Override
 	protected JSONArray doInBackground(String... params) {
+		Log.d("TEST", "testing execute");
 		int type = Integer.parseInt(params[0]);
 		List<NameValuePair> nameValuePairs;
 		JSONArray response = null;
 		switch (type) {
 		case CREATE_POST:
-			nameValuePairs = new ArrayList<NameValuePair>(2);
+			nameValuePairs = new ArrayList<NameValuePair>(3);
 			nameValuePairs.add(new BasicNameValuePair("title", params[1]));
+			nameValuePairs.add(new BasicNameValuePair("tag", "new post"));
 			nameValuePairs.add(new BasicNameValuePair("body", params[2]));
 			response = sendHttpPost(CREATE_POST, nameValuePairs);
 			break;
 		case SEARCH_QUERY:
-			nameValuePairs = new ArrayList<NameValuePair>(1);
+			nameValuePairs = new ArrayList<NameValuePair>(2);
 			nameValuePairs.add(new BasicNameValuePair("keyword", params[1]));
+			nameValuePairs.add(new BasicNameValuePair("tag", "search posts"));
 			response = sendHttpPost(SEARCH_QUERY, nameValuePairs);
 			break;
 		}
@@ -53,12 +58,15 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONArray> {
 		JSONArray ja = null;
 
 		try {
+			Log.d("HTTP", "Sending HTTP POST");
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			HttpResponse response = httpclient.execute(httppost);
+			Log.d("HTTP", "Finished sending");
 	        String result = EntityUtils.toString(response.getEntity());
-	        Log.d("json?", result);
-	         
-	        ja = new JSONArray(result);
+	        Log.d("MYJSON", result);
+	        JSONObject jo = new JSONObject(result); 
+	        ja = new JSONArray();
+	        ja.put(jo);
 	        
 		} catch (Exception e) {
 			e.printStackTrace();
