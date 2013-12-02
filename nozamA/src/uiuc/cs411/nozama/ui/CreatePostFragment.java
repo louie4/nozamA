@@ -66,7 +66,7 @@ public class CreatePostFragment extends Fragment {
 		description = ((EditText)getActivity().findViewById(R.id.descriptionInput)).getText().toString();
 		pathToImage = (String)((ImageView)getActivity().findViewById(R.id.imagePreview)).getContentDescription();
 		
-		if(title.length() == 0 || description.length() == 0 || pathToImage == null) {
+		if(title.length() == 0 || description.length() == 0 ) {//|| pathToImage == null) {
 			Context context = getActivity().getApplicationContext();
 			CharSequence text = "Please fill in all the required fields";
 			int duration = Toast.LENGTH_SHORT;

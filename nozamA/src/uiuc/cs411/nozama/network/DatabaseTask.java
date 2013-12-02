@@ -2,7 +2,6 @@ package uiuc.cs411.nozama.network;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -13,12 +12,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+import uiuc.cs411.nozama.LoginActivity;
 import uiuc.cs411.nozama.R;
+import uiuc.cs411.nozama.RegisterActivity;
 import uiuc.cs411.nozama.content.Content;
 import uiuc.cs411.nozama.content.Content.Item;
 import uiuc.cs411.nozama.ui.SearchPostFragment;
-
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
@@ -27,7 +26,10 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONObject> {
 
 	public static final int CREATE_POST = 0;
 	public static final int SEARCH_QUERY = 1;
-
+	public static final int LOGIN = 2;
+	public static final int REGISTER = 3;
+	public static int lock;
+	
 	private static final String DATABASE_SITE = "http://web.engr.illinois.edu/~mgathma2/noZama/noZamaDB.php";
 
 	@Override
@@ -49,6 +51,22 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONObject> {
 			nameValuePairs.add(new BasicNameValuePair("keyword", params[1]));
 			nameValuePairs.add(new BasicNameValuePair("tag", "search posts"));
 			response = sendHttpPost(SEARCH_QUERY, nameValuePairs);
+			break;
+		case LOGIN:
+			nameValuePairs = new ArrayList<NameValuePair>(3);
+			nameValuePairs.add(new BasicNameValuePair("userName", params[1]));
+			nameValuePairs.add(new BasicNameValuePair("tag", "login"));
+			nameValuePairs.add(new BasicNameValuePair("password", params[2]));
+			response = sendHttpPost(LOGIN, nameValuePairs);
+			break;
+		case REGISTER:
+			nameValuePairs = new ArrayList<NameValuePair>(5);
+			nameValuePairs.add(new BasicNameValuePair("userName", params[1]));
+			nameValuePairs.add(new BasicNameValuePair("tag", "register"));
+			nameValuePairs.add(new BasicNameValuePair("password", params[2]));
+			nameValuePairs.add(new BasicNameValuePair("email", params[3]));
+			nameValuePairs.add(new BasicNameValuePair("location", params[4]));
+			response = sendHttpPost(REGISTER, nameValuePairs);
 			break;
 		}
 		return response;
@@ -94,9 +112,23 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONObject> {
 				
 				SearchPostFragment.adapter.notifyDataSetChanged();
 			}
+			if(result.getString("tag").equals("login")){
+				Log.d("result", result.toString());
+				LoginActivity.ret_val = result;
+				Log.d("ret_val", LoginActivity.ret_val.toString());
+				LoginActivity.checkResult();
+			}
+			if(result.getString("tag").equals("register")){
+				Log.d("result", result.toString());
+				RegisterActivity.ret_val = result;
+				Log.d("ret_val", RegisterActivity.ret_val.toString());
+				RegisterActivity.checkResult();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		
 
 	}
 

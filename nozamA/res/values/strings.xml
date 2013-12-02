@@ -8,5 +8,6 @@
     <string name="createpost">Create a Post</string>
     <string name="uploadpost">Upload post</string>
     <string name="search">Search</string>
+    <string name="title_activity_register">Activity Register</string>
 
 </resources>

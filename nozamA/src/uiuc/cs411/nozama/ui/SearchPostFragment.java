@@ -110,7 +110,7 @@ public class SearchPostFragment extends Fragment {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+				if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_NEXT) {
 					String query = v.getText().toString();
 					if (query.length() > 0) {
 
