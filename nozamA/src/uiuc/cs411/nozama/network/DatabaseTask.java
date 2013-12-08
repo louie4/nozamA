@@ -17,6 +17,7 @@ import uiuc.cs411.nozama.R;
 import uiuc.cs411.nozama.RegisterActivity;
 import uiuc.cs411.nozama.content.Content;
 import uiuc.cs411.nozama.content.Content.Item;
+import uiuc.cs411.nozama.listing.ListingContent;
 import uiuc.cs411.nozama.ui.SearchPostFragment;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -98,18 +99,8 @@ public class DatabaseTask extends AsyncTask<String, Void, JSONObject> {
 		try {
 			if(result.getString("tag").equals("search posts")) {
 				JSONArray posts = result.getJSONArray("posts");
-				Log.d("post", posts.toString());
-				JSONObject object = posts.getJSONObject(0);
-				Log.d("object", object.toString());
-				Log.d("title", object.getString("title"));
-				SearchPostFragment.emptyLists();
-				for(int i = 0; i < posts.length(); i++) {
-					Log.d("i",""+i);
-					String title = posts.getJSONObject(i).getString("title");
-					SearchPostFragment.titles.add(new Content.Item("title",posts.getJSONObject(i).getString("title")));
-					SearchPostFragment.bodies.add(new Content.Item("body",title + ": " +posts.getJSONObject(i).getString("body")));;
-				}
-				
+				ListingContent.init(posts);
+			
 				SearchPostFragment.adapter.notifyDataSetChanged();
 			}
 			if(result.getString("tag").equals("login")){
